@@ -1,32 +1,3 @@
-# Nasty workaround for nested optionnal block
-# Works, but edit carefully, if at all.
-locals {
-  server_side_encryption_configuration_enabled = [
-    [[[
-      {
-        rule = [
-          {
-            apply_server_side_encryption_by_default = []
-          },
-        ]
-      },
-    ]]],
-    [[[
-      {
-        rule = [
-          {
-            apply_server_side_encryption_by_default = [
-              {
-                sse_algorithm = "aws:kms"
-              },
-            ]
-          },
-        ]
-      },
-    ]]],
-  ]
-}
-
 resource "aws_s3_bucket" "bucket" {
   count = "${var.storage_encrypted_at_rest == false ? 1 : 0}"
 
