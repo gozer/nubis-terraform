@@ -28,7 +28,7 @@ locals {
 }
 
 resource "aws_s3_bucket" "bucket" {
-  count = "${var.enabled}"
+  count = "${var.storage_encrypted_at_rest == false ? 1 : 0}"
 
   # Bucket can't be more than 63 characters long, so truncate away randomness
   bucket = "${replace(data.template_file.random.rendered,"/^(.{63}).*/","$1")}"
@@ -84,8 +84,6 @@ resource "aws_s3_bucket" "bucket" {
       storage_class = "GLACIER"
     }
   }
-
-  server_side_encryption_configuration = "${local.server_side_encryption_configuration_enabled[signum(var.storage_encrypted_at_rest)]}"
 
   tags = {
     Name           = "${var.service_name}-${var.environment}-${var.purpose}"
