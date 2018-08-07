@@ -2,7 +2,7 @@
 # Works, but edit carefully, if at all.
 locals {
   server_side_encryption_configuration_enabled = [
-    [[[[]]]],
+    [[[{}]]],
     [[[
       {
         rule = [
