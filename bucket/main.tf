@@ -2,14 +2,14 @@
 # Works, but edit carefully, if at all.
 locals {
   server_side_encryption_configuration_enabled = [
-    [],
+    [[[]]],
     [[[
       {
         rule = [
           {
             apply_server_side_encryption_by_default = [
               {
-                sse_algorithm = "aws:kms:XX"
+                sse_algorithm = "aws:kms"
               },
             ]
           },
