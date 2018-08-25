@@ -21,3 +21,7 @@ output "name" {
 output "source_security_group_id" {
   value = "${aws_elb.load_balancer.source_security_group_id}"
 }
+
+output "security_group_id" {
+  value = "${aws_security_group.load_balancer.id}"
+}

@@ -10,27 +10,6 @@ resource "aws_security_group" "load_balancer" {
 
   vpc_id = "${module.info.vpc_id}"
 
-  ingress {
-    from_port   = "${var.port_http}"
-    to_port     = "${var.port_http}"
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = "${var.port_https}"
-    to_port     = "${var.port_https}"
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = {
     Name           = "${var.service_name}-${var.environment}"
     Region         = "${var.region}"
@@ -43,6 +22,36 @@ resource "aws_security_group" "load_balancer" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_security_group_rule" "http" {
+  type            = "ingress"
+  from_port       = "${var.port_http}"
+  to_port         = "${var.port_http}"
+  protocol        = "tcp"
+  cidr_blocks     = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.load_balancer.id}"
+}
+
+resource "aws_security_group_rule" "https" {
+  type            = "ingress"
+  from_port       = "${var.port_https}"
+  to_port         = "${var.port_https}"
+  protocol        = "tcp"
+  cidr_blocks     = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.load_balancer.id}"
+}
+
+resource "aws_security_group_rule" "egress" {
+  type            = "egress"
+  from_port       = 0
+  to_port         = 0
+  protocol        = "-1"
+  cidr_blocks     = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.load_balancer.id}"
 }
 
 data "template_file" "ssl_cert_id" {
