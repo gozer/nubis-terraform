@@ -79,3 +79,8 @@ variable "arena" {
 variable "idle_timeout" {
   default = "60"
 }
+
+variable "whitelist_cidrs" {
+  type    = "list"
+  default = ["0.0.0.0/0"]
+}
