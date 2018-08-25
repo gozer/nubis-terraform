@@ -52,6 +52,14 @@ variable "backend_port_https" {
   default = "80"
 }
 
+variable "port_http" {
+  default = "80"
+}
+
+variable "port_https" {
+  default = "443"
+}
+
 variable "protocol_http" {
   default = "http"
 }

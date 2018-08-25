@@ -10,6 +10,27 @@ resource "aws_security_group" "load_balancer" {
 
   vpc_id = "${module.info.vpc_id}"
 
+  ingress {
+    from_port   = "${var.port_http}"
+    to_port     = "${var.port_http}"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = "${var.port_https}"
+    to_port     = "${var.port_https}"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags = {
     Name           = "${var.service_name}-${var.environment}"
     Region         = "${var.region}"
@@ -22,36 +43,6 @@ resource "aws_security_group" "load_balancer" {
   lifecycle {
     create_before_destroy = true
   }
-}
-
-resource "aws_security_group_rule" "http" {
-  type            = "ingress"
-  from_port       = 80
-  to_port         = 80
-  protocol        = "tcp"
-  cidr_blocks     = ["0.0.0.0/0"]
-
-  security_group_id = "${aws_security_group.load_balancer.id}"
-}
-
-resource "aws_security_group_rule" "https" {
-  type            = "ingress"
-  from_port       = 443
-  to_port         = 443
-  protocol        = "tcp"
-  cidr_blocks     = ["0.0.0.0/0"]
-
-  security_group_id = "${aws_security_group.load_balancer.id}"
-}
-
-resource "aws_security_group_rule" "egress" {
-  type            = "egress"
-  from_port       = 0
-  to_port         = 0
-  protocol        = "-1"
-  cidr_blocks     = ["0.0.0.0/0"]
-
-  security_group_id = "${aws_security_group.load_balancer.id}"
 }
 
 data "template_file" "ssl_cert_id" {
@@ -81,14 +72,14 @@ resource "aws_elb" "load_balancer" {
   listener {
     instance_port     = "${var.backend_port_http}"
     instance_protocol = "${var.backend_protocol}"
-    lb_port           = 80
+    lb_port           = "${var.port_http}"
     lb_protocol       = "${var.protocol_http}"
   }
 
   listener {
     instance_port      = "${var.backend_port_https}"
     instance_protocol  = "${var.backend_protocol}"
-    lb_port            = 443
+    lb_port            = "${var.port_https}"
     lb_protocol        = "${var.protocol_https}"
     ssl_certificate_id = "${element(split(",",data.template_file.ssl_cert_id.rendered),  ( signum(length(var.ssl_cert_name_prefix)) * ( 1 - signum(var.no_ssl_cert) ) ) + ( 2 * signum(var.no_ssl_cert) )  )}"
   }
